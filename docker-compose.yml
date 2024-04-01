@@ -1,0 +1,59 @@
+version: '3'
+services:
+  app: 
+    build: 
+      context: ./Vite
+      dockerfile: ./dockerfile
+    environment:
+      - VITE_APP_SERVER_URL=http://api:5000
+    command: npm run dev -- --host
+    networks:
+      - application
+    ports:
+      - 5173:5173
+  redis:
+    image: redis:7.2.4-alpine3.19
+    networks:
+      - application
+  celery:
+    build: 
+      context: ./Flask
+      dockerfile: ./dockerfile
+    environment:
+      - FLASK_APPLICATION_TYPE=deployment
+      - FLASK_REDIS_URL=redis://redis:6379/0
+    command: celery -A app.celery worker --loglevel=info --pool=solo
+    networks:
+      - application
+    depends_on:
+      - redis
+  api:
+    build:
+      context: ./Flask
+      dockerfile: ./dockerfile
+    environment:
+      - FLASK_APPLICATION_TYPE=deployment
+      - FLASK_REDIS_URL=redis://redis:6379/0
+    command: python runner.py
+    networks:
+      - application
+    depends_on:
+      - celery
+      - redis
+    ports:
+      - 5000:5000
+  nginx:
+    image: nginx
+    volumes:
+      - ./Nginx/:/etc/nginx/conf.d/
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - application
+    depends_on:
+      - app
+      - api
+
+networks:
+  application:
