@@ -1,9 +1,18 @@
-import React from 'react'
+import React from "react";
+import { useNavigate, useLocation, NavLink } from "react-router-dom";
 
 const Login = () => {
-  return (
-    <div>Login</div>
-  )
-}
+  
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
 
-export default Login
+  return (
+    <>
+      <h1>Login</h1>
+      <NavLink to={"/home"} replace > Go to home </NavLink>
+    </>
+  );
+};
+
+export default Login;

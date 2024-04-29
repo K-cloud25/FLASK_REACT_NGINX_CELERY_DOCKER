@@ -46,12 +46,6 @@ function App() {
     <>
     <AppState>
       <RouterProvider router={router} />
-      {/* <BrowserRouter>
-        <Routes>
-          <Route exact path='/' element={<Home />} />
-          <Route path='/page' element={<Page />} />
-        </Routes>
-      </BrowserRouter> */}
     </AppState>
     </>
   )
